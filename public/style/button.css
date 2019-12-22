@@ -1,0 +1,18 @@
+﻿.button {
+  display:inline-block;
+  width:100%;
+  color: white;
+  font-family: system-ui;
+  text-decoration: none;
+  user-select: none;
+  outline: none;
+ // border: 2px solid #6b051f;
+  font-size:4em;
+  transition: 0.2s;
+  background: #780e2b;
+  margin-top:3px;
+  position:relative;
+  
+} 
+.button:hover { background: black; }
+.button:active { background: white;}

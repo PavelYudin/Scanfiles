@@ -1,0 +1,15 @@
+﻿.superbutton {
+      width:4em;
+      height:1.3em;
+      border-radius:1em;
+      background:#780e2b;
+      color:#fff;
+      font-size:1.5em;
+      cursor:pointer;
+}     
+.superbutton:hover{
+      background:black;
+}
+.superbutton:focus{
+      outline:none;
+}

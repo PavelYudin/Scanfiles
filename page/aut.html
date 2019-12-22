@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="./auth.css" type="text/css">
+	<link rel="stylesheet" href="./superbutton.css" type="text/css">
+    <title>Scanfiles</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+	<div class="form">
+		<div class="title">
+			Authentication
+		</div>
+		<div class="login">
+			<label>
+				Login
+			</label>
+			<input type="text" name="login" autofocus="yes" autocomplete="off">
+		</div>
+		<div class="password">
+			<label>
+				Password
+			</label>
+			<input type="password" name="password" autocomplete="off">
+		</div>
+		<div class="button">
+			<input type="submit" name="button" value="Send" class="superbutton">
+		</div>
+		<div class="message"></div>
+	</div>
+	<script defer type= "text/javascript" src="./ajax.js"></script>
+	<script defer type="text/javascript">
+		if(document.cookie) document.cookie+='=; expires=Thu, 01 Jan 1970 00:00:01 GMT;'//clear cookie
+		let button=document.querySelector('.superbutton');
+		let message=document.querySelector('.message');
+		let login=document.querySelector('[name=login]');
+		let password=document.querySelector('[name=password]')
+		button.addEventListener('click',e=>{
+			if(!login.value || !password.value){message.innerHTML='Please enter your login and password'; return};
+			let body={};
+			body.login=login.value;
+			body.password=password.value;
+			login.value=password.value='';
+			body=JSON.stringify(body);
+			request('POST',"/authentication",true,onreadystatechange,body);
+			function onreadystatechange() {
+                if (this.readyState == 4) {
+                	if(this.responseText.includes('/')){
+						location.href=this.responseText;
+					}else{
+						message.innerHTML=this.responseText;
+						login.focus();
+					}
+                }
+            }
+		})
+	</script>
+</body>
+<html>

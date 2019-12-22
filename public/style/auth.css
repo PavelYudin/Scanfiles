@@ -1,0 +1,44 @@
+﻿.form{
+      background-color:#ebeef2;
+      border-radius: 10em;
+      border: 0.5em solid black;
+      position: absolute;
+      width: 30%;
+      height: 30%;      
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      margin: auto;
+      text-align: center;
+}
+.title{
+      font-size: 200%;
+      font-family: system-ui;
+      font-style: italic;
+      font-weight:bold;
+}
+.login{
+      top:10%;
+}
+.password{
+      top:20%;
+}
+.button{
+      bottom: -30%;
+}
+
+.message{
+      bottom: -40%;
+      font-size: 100%;
+      font-family: system-ui;
+      font-style: italic;
+      font-weight:bold;
+      color:red;
+}
+.login, .button, .password, .message{
+      position: relative;
+}
+.login, .password{
+      font-size: 150%;
+}

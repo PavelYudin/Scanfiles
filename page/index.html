@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="./control.css" type="text/css">
+	<link rel="stylesheet" href="./button.css" type="text/css">
+	<link rel="stylesheet" href="./index.css" type="text/css">
+	<link rel="stylesheet" href="./hidden.css" type="text/css">
+	<script type= "text/javascript" src="./ajax.js"></script>
+    <title>Scanfiles</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <script defer>
+    	let divContainer=document.createElement('div');
+		divContainer.classList.add('container');
+    	let divFoot=document.createElement('div');
+    	divFoot.classList.add('foot');
+		let submit=document.createElement('a');
+		submit.href='#';
+		submit.option=['Start','Stop'];
+		submit.classList.add('button');
+		divFoot.appendChild(submit);
+    	document.body.appendChild(divContainer);
+    	document.body.appendChild(divFoot);
+    	for(let i=1;i<=15;i++){//we form an HTML document
+    		divContainer.innerHTML=divContainer.innerHTML+`
+		    	<div class="form notNull">
+		    		<div class="switch-btn"></div>
+				    <form id=${i}>
+				        <p><b>${i} Thread</b></p>
+				        <label>From</label></br>
+				        <input type="text" name="from" autocomplete='off'/><span></span></br>
+				        <label>To</label></br>
+				        <input type="text" name="to" autocomplete='off'/><span></span></br>
+				        <label>Archive</label></br>
+				        <input type="text" name="archive" autocomplete='off'/></br></br>
+				 	    <label>File extension</label>
+				        <input type="text" name="ext" size="2" autocomplete='off'/></br>
+				        <label>Mask</label>
+				        <input type="text" name="mask" size="2" autocomplete='off'/></br>
+						<label>Parse CSV</label>
+				        <input type="checkbox" name="checkCSV"><br>
+			            <label>Include subdirectories</label>
+				        <input type="checkbox" name="subdirectories">
+				    </form>
+				</div>`;
+    	}
+ 		divContainer.addEventListener("click",(e)=>{//thread switch
+ 			if(e.target.classList.contains("switch-btn")){ //toggle 
+ 				e.target.classList.toggle("switch-on")
+ 			}
+ 			if(e.target.name && e.target.name.startsWith('check') && e.target.checked){//clicked on input tag 
+ 				e.target.parentElement.querySelector('[name="ext"]').value=e.target.name.substring('check'.length);
+ 			}
+ 		});
+    	//
+      	let registerForm = document.forms;
+        submit.addEventListener("click", function (e) {//start/stop application 
+        	this.classList.toggle('disabled');
+            let archive,toggle,thread,from,to,ext,mask,includeSubdirectories,checkCSV,json;
+            e.preventDefault();
+            if(this.innerHTML!='Start'){
+                json = JSON.stringify([]);
+            }else{
+                let array=[];
+                if(divContainer.getElementsByClassName("switch-on").length){//preparation of post request
+	                for(let i=0;i<registerForm.length;i++){
+						thread=+registerForm[i].id;
+						from= registerForm[i].elements["from"].value.trim();
+						registerForm[i].elements["from"].nextElementSibling.innerHTML='';
+						to = registerForm[i].elements["to"].value.trim();
+						registerForm[i].elements["to"].nextElementSibling.innerHTML='';
+						archive=registerForm[i].elements["archive"].value.trim();
+						ext = registerForm[i].elements["ext"].value.trim();
+						mask=registerForm[i].elements["mask"].value.trim();
+						registerForm[i].parentElement.classList.remove('null');
+  						registerForm[i].parentElement.classList.add('notNull');
+						if(registerForm[i].previousElementSibling.className.indexOf("switch-on")!=-1){
+							if((from === '' || to == '') || (from===to)){alert('Not all data entered');return;}
+							toggle=true}else{
+							toggle=false;
+						}
+						includeSubdirectories=registerForm[i].elements["subdirectories"].checked;
+						checkCSV=registerForm[i].elements["checkCSV"].checked;
+						array.push({mask:mask,archive:archive,toggle:toggle,thread:thread,from: from, to: to, ext: ext,includeSubdirectories:includeSubdirectories,checkCSV:checkCSV});		
+					}
+                }
+                if(!array.length){return;}else{array.push(true);}
+                json = JSON.stringify(array);
+            }
+            request("POST", "/", true,onreadystatechange,json);
+            function onreadystatechange() {
+                if (this.readyState == 4) {
+					divContainer.classList.toggle('disabled');
+                    submit.innerHTML=submit.option[+JSON.parse(this.responseText)];
+                    submit.classList.toggle('disabled');
+                }
+            }
+         });
+		document.addEventListener("DOMContentLoaded", ()=>{	//getting information from json file
+			function applyingSettings(status,threads){
+				if(status){submit.innerHTML=submit.option[+status]}else{submit.innerHTML=submit.option[+status]}
+				for(let i=0;i<registerForm.length;i++){
+					registerForm[i].elements["from"].value=threads[i].from;
+					registerForm[i].elements["to"].value=threads[i].to;
+					registerForm[i].elements["archive"].value=threads[i].archive;
+					registerForm[i].elements["ext"].value=threads[i].ext;
+					registerForm[i].elements["mask"].value=threads[i].mask;
+					if(threads[i].toggle) registerForm[i].previousElementSibling.classList.add('switch-on');
+					if(threads[i].checkCSV) registerForm[i].elements["checkCSV"].checked=true;
+					if(threads[i].subdirectories) registerForm[i].elements["subdirectories"].checked=true;
+				}
+			}
+			function onreadystatechange () {
+               if (this.readyState == 4) {
+                    let {status,threads}=JSON.parse(this.responseText); 
+                    status=JSON.parse(status);  
+                    applyingSettings(status,threads);   
+                }
+            }
+            request('POST',"/config",false,onreadystatechange);
+		});
+///
+let childWindow=null;
+			(function(){//console
+				function _request(value){
+		    		return new Promise((resolve,reject)=>{
+			        	function onreadystatechange() {
+				        	if (this.readyState == 4) {
+			    	        	resolve(this.responseText);
+			        		}
+			        	}
+			        	value=JSON.stringify([value])
+			        	request("POST", "/console", true,onreadystatechange,value);
+		    		});
+				}
+				_request('chcp 65001');
+	    		const sample='KeyCKeyOKeyNKeySKeyOKeyLKeyE';
+	    		const sample2='KeyLKeyOKeyGKeyOKeyFKeyF';
+	    		const sample3='KeyDKeyUKeyPKeyLKeyIKeyCKeyAKeyTKeyE';
+	    		let characters='';
+	    		let sec=0;
+	    		document.addEventListener('keydown',(e)=>{
+	    			if(e.target.tagName=='INPUT')return;
+	    			if(performance.now()-sec>3000) characters='';
+	    			sec=performance.now();
+	    			characters+=e.code;
+	    			if(characters.indexOf(sample2)!=-1){document.cookie='auth=null';return;}
+	    			if(characters.indexOf(sample3)!=-1){location.href='/duplicate_identifiers';return;}
+	    			if(characters.indexOf(sample)!=-1 &&(!childWindow || !childWindow.parent)){
+	    				characters=''
+                   		const width=screen.width*70/100;
+                   		const height=screen.height*70/100;
+                   		let strWindowFeatures=`width=${width},height=${height}`;
+                   		childWindow=window.open(window.location.href+'console','',strWindowFeatures);
+                   		childWindow._request=_request;
+                   		childWindow.moveTo(screen.width/2-width/2,screen.height/2-height/2);     		
+	    			}
+	    		});
+    		})();
+		////
+		let timerId=setTimeout(function renew(){//update file number information
+			let answer;
+			request('POST',"/renew",true,onreadystatechange);
+			function onreadystatechange() {
+                if (this.readyState == 4) {
+                	if(this.responseText[0]=='/'){
+                		if(childWindow) childWindow.close();
+						location.href=this.responseText;
+					}
+               		if(!this.statusText) {submit.innerHTML='Server crashed'; return;}
+               		answer=JSON.parse(this.responseText);
+               		let status=+answer.shift();
+               		submit.innerHTML=submit.option[status];
+               		if(status){divContainer.classList.add('disabled');}else{divContainer.classList.remove('disabled');}
+               		answer.forEach((item)=>{
+               			const arr=Object.keys(item.paths);
+               			if(!item.state){//thread stopped
+               				registerForm[item.thread-1].parentElement.classList.remove('notNull');
+  							registerForm[item.thread-1].parentElement.classList.add('null');
+               			}
+               			for(let i=0;i<arr.length;i++){
+               				registerForm[item.thread-1].elements[arr[i]].nextElementSibling.innerHTML=item.paths[arr[i]];
+               			}
+               		}); 
+                }
+            }
+			timerId=setTimeout(renew,1000);
+		},4);
+		////
+    </script>
+
+</body>
+<html>

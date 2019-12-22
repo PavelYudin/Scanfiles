@@ -1,0 +1,27 @@
+﻿body{
+  background: #ebeef2;
+}
+div{
+	text-align: center;
+	  top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      margin: auto;
+      width: : 30%;
+      font-size: 120%;
+}
+[name=path]{
+	font-size: 100%;
+
+}
+.output{
+	font-weight:bold;
+	font-family: system-ui;
+  font-style: italic;
+	font-size: 100%;
+}
+.SHI{
+  color: red;
+  border: '2px dotted black';
+}

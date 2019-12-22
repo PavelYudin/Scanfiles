@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="./superbutton.css" type="text/css">
+	<link rel="stylesheet" href="./duplicate_identifiers.css" type="text/css">
+    <link rel="stylesheet" href="./hidden.css" type="text/css">
+	<script defer type= "text/javascript" src="./ajax.js"></script>
+    <title>Scanfiles</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+	<div>
+		<h1>
+			Search for duplicates in NDR files
+		</h1>
+	</div>
+	<div>
+		<input type="text" name="path" autocomplete="off" size="100" autofocus>
+		<input type="submit" name="button" value="Search" class="superbutton">
+	</div>
+	<script defer type="text/javascript">
+		let button=document.querySelector('.superbutton');
+		let path=document.querySelector('[name=path]');
+		let output = document.createElement('div');
+		output.classList='output';
+       	document.body.appendChild(output);
+       	const sample='KeyMKeyAKeyIKeyN';
+       	const sample2='KeyLKeyOKeyGKeyOKeyFKeyF';
+       	let characters='';
+	    let sec=0;
+       	document.addEventListener('keydown',(e)=>{
+	    	if(e.target.tagName=='INPUT')return;
+	    	if(performance.now()-sec>3000) characters='';
+	    	sec=performance.now();
+	    	characters+=e.code;
+       		if(characters.indexOf(sample2)!=-1){
+       			document.cookie='auth=null';
+          		function onreadystatechange() {
+                	if (this.readyState == 4) {
+						if(this.responseText[0]=='/') location.href=this.responseText;
+                	}
+            	}
+            	let body=JSON.stringify({path:'logoff'});
+       			request('POST',"/duplicate_identifiers",true,onreadystatechange,body);
+       			return;
+       		}
+       		if(characters.indexOf(sample)!=-1){location.href='/';return;}
+       	});
+		button.addEventListener('click',e=>{//search for duplicate SHI
+			output.innerHTML='';
+			let value=path.value.trim();
+			let id=(+new Date()+Math.random()).toString(16);
+			if(!value) return;
+			let body={path:value,id:id};
+			body=JSON.stringify(body);
+     		document.body.classList.add('disabled')
+			request('POST',"/duplicate_identifiers",true,onreadystatechange,body);
+			function onreadystatechange() {
+				function checkDoubleShi(item){
+					for(let i=0;i<output.children.length;i++){
+						let divShi=output.children[i].firstElementChild;
+						if(divShi.textContent===item.shi){
+							divShi.nextElementSibling.textContent=item.nameCSV;
+							return true;
+						}
+					}
+				}
+                if (this.readyState == 4) {
+                	let answer
+                	try{
+                	    answer=JSON.parse(this.responseText);
+                	}catch(err){answer=this.responseText;}
+                	finally{console.log(answer.length)
+                        if(typeof answer==='string') {
+                            if(answer[0]=='/') {
+                                location.href=this.responseText;
+                                return;
+                            }else{
+                                output.textContent=answer;
+                            }
+                        } 
+                        if(Array.isArray(answer)){
+	                    	answer.forEach((item,i)=>{
+	                            if(i==0) return;
+	                           	if(checkDoubleShi(item)) return;
+		                        let blockOutput=document.createElement('div');
+		                        let divSHI=document.createElement('div');
+		                        divSHI.classList.add('SHI');
+		                        let divNDR=document.createElement('div');
+		                        divSHI.textContent=item.shi;
+		                        divNDR.textContent=item.nameCSV;
+		                        blockOutput.appendChild(divSHI);
+		                        blockOutput.appendChild(divNDR);
+		                        output.appendChild(blockOutput);
+	                   		})	
+	                        if(!answer[0]) {
+		                        request('POST',"/duplicate_identifiers",true,onreadystatechange,JSON.stringify({id:id}));
+		                        return;
+	                        }
+	                        if(!output.children.length) output.textContent='No found';
+                    	}
+                		document.body.classList.remove('disabled');
+                	}//finally
+                }//status 4
+            }
+		});
+	</script>
+</body>
+<html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    <link rel="stylesheet" href="./console.css" type="text/css">
+		<title>Scanfiles</title>
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<div>
+			<p>CONSOLE</p>
+			<textarea placeholder="Enter the command here" autofocus="true" id="cmd">
+			</textarea>
+		</div>
+    	<script>
+        function findLog(item){
+        	let pos=item.lastIndexOf('\\');
+            return item.slice(pos+1);
+        }
+        function download(value){//download log file
+            let download='download';
+            if(value!=download && value.endsWith(download)){
+                let pos=value.lastIndexOf(download);
+                let property=(value.slice(0,pos)).trimRight();
+                let path=checkLogs(property);
+                if(!path) return false;
+                location.href='/'+download+path;
+                return true;
+            }
+        }
+        let logs = [];
+        function checkLogs(value){
+        	if(logs.length>=+value) return logs[+value-1];
+        	return logs.find(item=>{return value.toLowerCase()==findLog(item);})
+        }
+        document.addEventListener('keydown',function(e){//command processing
+          if(e.code=='Enter' || e.code == 'NumpadEnter'){        
+            let value=cmd.value.trim();
+            let pos=value.lastIndexOf('\n');
+            value=value.slice(pos+1).trim();
+            if(!value || value.endsWith('\\')) return;
+            if(value.toLowerCase().endsWith('cls')) {cmd.value='';return;}
+            if(value.toLowerCase().endsWith('dir')) {cmd.value+='   Access is denied!';return;}
+            if(value.toLowerCase()=='exit') window.close();
+            if(download(value)) return;
+            value=checkLogs(value) || value;
+            window._request(value)
+            .then((value)=>{
+            	try{
+            		let arr=JSON.parse(value);
+            		value='';
+            		arr.forEach((item,i)=>{
+            			value+=i+1+'  -  '+findLog(item)+'\n';
+            			logs.push(item);
+            		})
+            	}catch(e){}
+            	finally{
+            		cmd.value=cmd.value+'\n'+value;
+            		cmd.scrollTop = cmd.scrollHeight;
+            	}
+            })
+            .catch((err)=>{cmd.value=cmd.value+'\n'+err.message});
+          }
+        });
+    		document.addEventListener('keydown',(e)=>{e.code=='Escape'?window.close():null;});
+    	</script>
+	</body>
+<html>

@@ -1,0 +1,39 @@
+﻿    .container{
+      height:5%;
+      text-align: center;
+      position: relative;
+      border: 3px dotted black;
+      padding-bottom:1%;
+      background:#ebeef2;
+    }
+
+    .form{
+      position:relative;
+      display: inline-block;
+      margin-right:2%;
+      width: 15%;
+      height: 10%;
+      margin-top: 1%;
+      margin-left:2%;
+      text-align: left;
+      //font-size:60%;
+      font-family:system-ui;
+    }
+    .notNull{
+      border: 4px double black;
+    }
+    form{
+      margin: 2%;
+    }
+    .foot{
+      text-align:center;
+    }
+    [name="from"],[name="to"],[name="archive"]{
+      width:80%;
+    }
+    span{
+      font-weight:bolder;
+    }
+    .null{
+      border: 4px double red;
+    }

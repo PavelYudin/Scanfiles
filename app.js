@@ -127,7 +127,7 @@ function copyFile(item,to){//copy file
 			})
 		})
 		.catch(err=>{
-			if(checkError(err)) {error(err,stats)}else{setTimeout(start,5000);}
+			if(checkError(err)) {error(err,start)}else{setTimeout(start,5000);}
 		})
 })();
 

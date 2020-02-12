@@ -56,14 +56,15 @@
     	//
       	let registerForm = document.forms;
         submit.addEventListener("click", function (e) {//start/stop application 
-        	this.classList.toggle('disabled');
             let archive,toggle,thread,from,to,ext,mask,includeSubdirectories,checkCSV,json;
             e.preventDefault();
             if(this.innerHTML!='Start'){
+		this.classList.toggle('disabled');
                 json = JSON.stringify([]);
             }else{
                 let array=[];
                 if(divContainer.getElementsByClassName("switch-on").length){//preparation of post request
+			this.classList.toggle('disabled');
 	                for(let i=0;i<registerForm.length;i++){
 						thread=+registerForm[i].id;
 						from= registerForm[i].elements["from"].value.trim();
